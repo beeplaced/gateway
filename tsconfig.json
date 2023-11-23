@@ -1,0 +1,8 @@
+{
+  "compilerOptions": {
+    "allowJs": true,    // Allows JavaScript files to be included in the project
+    "checkJs": false,    // Enables type checking for JavaScript files
+    "strict": true,     // Enforces strict type checking and other strict behavior
+    "outDir": "./void"  //No compilation atm
+  }
+}

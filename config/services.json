@@ -1,0 +1,66 @@
+{
+    "routes": [
+        {
+            "path": "many_requests",
+            "services": {
+                 "one": {
+                    "title": "grab what",
+                    "method": "GET",
+                    "serviceInstance": "axios",
+                    "command": "content",
+                    "curl": "internal",
+                    "transformations": {
+                        "output": "xlsx"
+                    }
+                }
+            }
+        },
+        {
+            "path": "jsonplaceholder",
+            "services": {
+                 "comments": {
+                    "title": "grab comments from jsonplaceholder",
+                    "method": "GET",
+                    "serviceInstance": "axios",
+                    "command": "jsonplaceholder",
+                    "curl": "comments",
+                    "transformations": {
+                        "output": "json"
+                    }
+                },
+                "albums": {
+                    "title": "grab albums from jsonplaceholder",
+                    "method": "GET",
+                    "serviceInstance": "axios",
+                    "command": "jsonplaceholder",
+                    "curl": "albums",
+                    "transformations": {
+                        "output": "json"
+                    }
+                },
+                "photos": {
+                    "title": "grab photos from jsonplaceholder",
+                    "method": "GET",
+                    "serviceInstance": "axios",
+                    "command": "jsonplaceholder",
+                    "curl": "photos",
+                    "transformations": {
+                        "output": "json"
+                    }
+                }
+            }
+        },
+        {
+            "path": "status",
+            "services": {
+                 "def": {
+                    "method": "GET",
+                    "serviceInstance": "status",
+                    "command": "status",
+                    "curl": false,
+                    "transformations": {}
+                    }
+            }
+        }
+    ]
+}

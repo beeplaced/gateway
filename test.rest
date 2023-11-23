@@ -1,0 +1,34 @@
+### Authentication
+GET http://localhost:3000/status
+Authorization: Basic c2RzLXBhcnNlcjo5VDIxSUZDb0p6VTROeVI3NTlPUTN6d3ZNdmhNUDQ5Ug==
+
+### Authentication
+GET http://localhost:3000/jsonplaceholder/comments
+Authorization: Basic 9T21IFCoJzU4NyR759OQ3zwvMvhMP49R
+
+### Authentication
+GET http://localhost:3000/jsonplaceholder/albums
+Authorization: Basic 9T21IFCoJzU4NyR759OQ3zwvMvhMP49R
+
+### Authentication
+GET http://localhost:3000/jsonplaceholder/photos
+Authorization: 9T21IFCoJzU4NyR759OQ3zwvMvhMP49R
+
+### Authentication
+GET http://localhost:3000/gri/16
+Authorization: 9T21IFCoJzU4NyR759OQ3zwvMvhMP49R
+
+### Authentication
+GET http://localhost:3000/mailattachment
+Authorization: Basic 9T21IFCoJzU4NyR759OQ3zwvMvhMP49R
+
+### Post
+POST http://localhost:3000/content
+Content-Type: application/json
+Authorization: 9T21IFCoJzU4NyR759OQ3zwvMvhMP49R
+
+{
+  "content": "gri",
+  "key": "value",
+  "another_key": "another_value"
+}

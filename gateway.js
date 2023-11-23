@@ -1,0 +1,15 @@
+require('dotenv').config();
+const express = require('express');
+const app = express();
+const bodyParser = require('body-parser');
+const swaggerUi = require('swagger-ui-express');
+const swaggerSpecs = require('./openapi/swagger-generated.json');
+const middleware = require('./routes/auth');
+const dist = require('./routes/distribution');
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpecs));
+app.use(express.json());
+app.use(middleware.auth);
+app.use(dist.routes);
+app.listen(process.env.PORT, () => console.log(`CONTENT GATEWAY @ PORT ${process.env.PORT}`));
