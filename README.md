@@ -4,9 +4,7 @@ V 0.0.2
 
 ## Overview
 
-The Content Gateway dynamically routes incoming API calls to defined services and returns the results. Service definitions are specified in the `services.json` file. Currently, adding a new service requires manual entry into the `services.json` file.
-
-Express Gateway is a microservices API gateway that sits at the heart of any microservices or serverless architecture, regardless of what language or platform you're using.
+The Content Gateway dynamically routes incoming API calls to defined microservices and returns the [defined result](#result). Service definitions are specified in the `services.json` file. Currently, [adding a new Services](#adding-services) requires manual entry into the `services.json` file.
 
 
 ## Table of Contents
