@@ -1,1 +1,11 @@
+# Ignore node_modules directory
 node_modules/
+
+# Ignore test.rest file
+test.rest
+
+# Ignore ESLint configuration file
+.eslintrc.json
+
+# Ignore TypeScript configuration file
+tsconfig.json
