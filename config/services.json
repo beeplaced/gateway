@@ -61,6 +61,18 @@
                     "transformations": {}
                     }
             }
+        },
+        {
+            "path": "result",
+            "services": {
+                 "def": {
+                    "method": "GET",
+                    "serviceInstance": "status",
+                    "command": "result",
+                    "curl": false,
+                    "transformations": {}
+                    }
+            }
         }
     ]
 }

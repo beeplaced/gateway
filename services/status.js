@@ -24,6 +24,17 @@ module.exports = class {
     }
 
     /** @param {requestInput} requestInput */
+    result = async (requestInput) => {
+        const message = 'Example result'
+        /** @type {ApiResponseInner} */
+        return {
+            data: [{result: true}],
+            status: 200,
+            message
+        }
+    }
+
+    /** @param {requestInput} requestInput */
     requestMissing = async (requestInput) => {
         /** @type {ApiResponseInner} */
         return {
