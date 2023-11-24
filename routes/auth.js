@@ -1,5 +1,14 @@
 const CustomError = require('../types/customError')
 const { grabConfig } = require('../config/readConfig');
+const hostLocker = require('host-locker');
+const hl = new hostLocker({
+    maxCallThreshold: 5,
+    secondsThreshold: 5,
+    allowedHosts: ['localhost']
+});
+
+const { parse } = require('url');
+
 const configData = grabConfig();
 
 const decodeAuth = async (encodedCredentials) => {
@@ -28,15 +37,44 @@ const decodeAuth = async (encodedCredentials) => {
  * @param {ExpressResponse} res - The response object.
  * @param {*} next
  */
+exports.host = async (req, res, next) => {
+    const host = req.get('Host');
+    const { hostname } = parse(`http://${host}`);
 
+    if (!hl.check(hostname)) {
+        res.status(403).json({ status: 403, auth: 'access denied' });
+        return
+    }
+    next();
+};
+
+/**
+ * @param {request} req - The request object from the API.
+ * @param {ExpressResponse} res - The response object.
+ * @param {*} next
+ */
 exports.auth = async (req, res, next) => {
     try {
-        if (!req.headers || !req.headers.authorization){
+        if (!req.headers || !req.headers.authorization) {
             throw new CustomError('Authentication failed', 401); // Unauthorized status code
         }
         const encodedCredentials = req.headers.authorization;
         await decodeAuth(encodedCredentials)
+        next();
+    } catch (err) {
+        console.log(err)
+        const status = err.status || 500
+        res.status(err.status || 500).json({ status, auth: false, error: err.message });
+    }
+};
 
+/**
+ * @param {request} req - The request object from the API.
+ * @param {ExpressResponse} res - The response object.
+ * @param {*} next
+ */
+exports.service = async (req, res, next) => {
+    try {
         const urlParts = req.url.split('/'); //CHECK ALL REQ !!!!!!!!!!!!!!!
         const request = urlParts[1];
         let authService = {} //Authenticated Service Route
@@ -46,7 +84,7 @@ exports.auth = async (req, res, next) => {
             throw new CustomError('request Missing', 401); // Unauthorized status code
         }
 
-        if (urlParts[2] && contentRoute.services[urlParts[2]]){
+        if (urlParts[2] && contentRoute.services[urlParts[2]]) {
             console.log('many', contentRoute.services[urlParts[2]])
             authService = contentRoute.services[urlParts[2]]
         }
@@ -71,4 +109,4 @@ exports.auth = async (req, res, next) => {
         const status = err.status || 500
         res.status(err.status || 500).json({ status, auth: false, error: err.message });
     }
-};
+}
