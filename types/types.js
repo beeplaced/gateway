@@ -22,17 +22,18 @@
  * @typedef {Object} request
  * @property {object} headers
  * @property {object} headers.authorization
- * @property {object} [body]
  * @property {string} command
  * @property {string} method
  * @property {string} service
  * @property {string} url
- * @property {string} [curl]
  * @property {string} request
+ * @property {ApiReturn} rawdata
+ * @property {object} [urlParts]
+ * @property {object} [body]
+ * @property {string} [curl]
  * @property {object} [param]
  * @property {string} [title]
  * @property {object} [transformations]
- * @property {ApiReturn} rawdata
  */
 
 

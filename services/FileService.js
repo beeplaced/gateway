@@ -1,12 +1,7 @@
 const fs = require('fs');
 const path = require('path');
-// const xlsx = require('xlsx');
-const crypto = require('crypto');
 const DBOPERATIONS = require('../database/DBOperations'); const _DB = new DBOPERATIONS();
-const PARSER = require('./parser'); const _PARSER = new PARSER();
 const AXIOS = require('../services/axios'); const _axios = new AXIOS();
-const mongoose = require('mongoose');
-
 
 const filesize = size => {
   const n = parseInt(size, 10) || 0
@@ -94,6 +89,38 @@ module.exports = class {
   return ApiResponse
   }
 
+  newfiles = async (requestInput) => {
+    let match = { _id: { $exists: true } }
+    match.status = 0
+    if (requestInput.param){
+      Object.keys(requestInput.param).map(p => {
+        match[p] = { $regex: requestInput.param[p], $options: 'i' }
+      })
+    }
+    const con = 'files'
+    const projects = {
+      _id: 0,
+      title: 1, sha: 1, size: 1
+    }
+    const files = await _DB.findSpecificFields(match, con, projects)
+    /** @type {ApiResponse} */
+    let ApiResponse = {
+      data: [],
+      status: 200,
+      message: ''
+    }
+
+    if (files.length === 0) {
+      ApiResponse.message = 'No files to available'
+      return ApiResponse
+    }
+
+    ApiResponse.data = files
+    ApiResponse.status = 200
+    ApiResponse.message = 'New files waiting for upload'
+    return ApiResponse
+  }
+
   checkfornewfileandparse = async() => {
     const match = { _id: { $exists: true }, status: { status: 0 } }
       const con = 'msdsd'
@@ -134,7 +161,7 @@ module.exports = class {
     return ApiResponse
   }
 
-  checkforfilestoparse = async () => {
+  filestoparse = async () => {
     const match = { _id: { $exists: true }, status: { status: 0 }
    }
     const con = 'msdsd'
@@ -160,7 +187,7 @@ module.exports = class {
     ApiResponse.data = files
 
     ApiResponse.status = 200
-    ApiResponse.message = 'Content Portal Parser API'
+    ApiResponse.message = 'Content Portal - grab all files to parse (status: 0)'
     return ApiResponse
   }
 

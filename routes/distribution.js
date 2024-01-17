@@ -34,8 +34,7 @@ exports.services = async function (req, res, next) {
     switch (true) {
       case running[command] === true:
         req.rawdata = {
-          status: 409,
-          message: 'task already started',
+          status: 409
         }
       next();
       return;
@@ -104,7 +103,7 @@ exports.services = async function (req, res, next) {
 }
 
 const prepOutput = (response) => {
-  /** @type {ApiResponse} */ const { data, status, message, elapsedTime, worker } = response
+  /** @type {ApiResponse} */ const { data, status, message, elapsedTime } = response
   const statusText = status && statusTitles[status] ? statusTitles[status] : statusTitles[500]
   let ret = {}
   switch (status) {
@@ -115,7 +114,6 @@ const prepOutput = (response) => {
         status,
         duration: `${elapsedTime} \u{1F60A}`,
         message: message ? `${statusText} - ${message}` : statusText,
-        worker
       }
       if (Array.isArray(data)) {
         ret.amount = data.length

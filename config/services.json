@@ -1,54 +1,35 @@
 {
     "routes": [
         {
-            "path": "jsonplaceholder",
+            "path": "portal",
             "services": {
-                 "comments": {
-                    "public": true,
-                    "title": "grab comments from jsonplaceholder",
+                 "filestoparse": {
+                    "title": "grab all files to parse (status: 0)",
                     "method": "GET",
-                    "serviceInstance": "axios",
-                    "command": "jsonplaceholder",
-                    "curl": "comments",
-                    "transformations": {
-                        "output": "json"
-                    }
+                    "serviceInstance": "files",
+                    "command": "filestoparse",
+                    "transformations": {}
                 },
-                "albums": {
-                    "public": true,
-                    "title": "grab albums from jsonplaceholder",
+                 "newfiles": {
+                    "title": "check for new files to be uploaded",
                     "method": "GET",
-                    "serviceInstance": "axios",
-                    "command": "jsonplaceholder",
-                    "curl": "albums",
-                    "transformations": {
-                        "output": "json"
-                    }
-                },
-                "photos": {
-                    "public": true,
-                    "title": "grab photos from jsonplaceholder",
-                    "method": "GET",
-                    "serviceInstance": "axios",
-                    "command": "jsonplaceholder",
-                    "curl": "photos",
-                    "transformations": {
-                        "output": "json"
-                    }
+                    "serviceInstance": "files",
+                    "command": "newfiles",
+                    "parameter": ["title"],
+                    "transformations": {}
                 }
-            }
+            }            
         },
         {
-            "path": "status",
+            "path": "public",
             "services": {
-                 "def": {
-                    "public": true,
+                 "status": {
+                    "title": "Status",
                     "method": "GET",
                     "serviceInstance": "status",
                     "command": "status",
-                    "curl": false,
-                    "transformations": {}
-                    }
+                    "transformations": { }
+                }
             }
         },
         {

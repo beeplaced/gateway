@@ -3,7 +3,7 @@
   "info": {
     "title": "Content Gateway API Swagger",
     "version": "0.0.1",
-      "description": "This API serves as a gateway with limited functionalities.\n\n You can find working examples in the 'Public' segment, that can be accessed without auth.\n\nAPI key is required for authentication, and it must be requested from an admin.",
+      "description": "This API serves as a gateway with spiecific functionalities.\n\n You can find working examples in the 'Public' segment, that can be accessed with public key auth.\n\n for every other task, YOUR-API-KEY is required for authentication, and it must be requested from an admin.",
       "contact": {
       "name": "Your Organization",
       "email": "admin@example.com"
@@ -12,11 +12,7 @@
     "tags": [
     {
       "name": "Public",
-      "description": "Working examples with limited return"
-    },
-    {
-      "name": "Health",
-      "description": "Health and Status"
+      "description": "Health, Status and others"
     },
     {
       "name": "Content Portal",
@@ -38,71 +34,11 @@
     }
   ],
   "paths": {
-    "/jsonplaceholder/comments": {
+    "/public/status": {
       "get": {
         "tags": ["Public"],
-        "summary": "Get comments from jsonplaceholder.",
-        "description": "Retrieve comments from the jsonplaceholder API.\n\n**Example Authorization Header:**\n```\nx-api-key: 7d0b2d51-ec70-4076-b02f-109244432a28 (universal key with limited access)\n```\n",
-        "responses": {
-          "200": {
-            "description": "Successful response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": "// Define properties based on your response"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/jsonplaceholder/albums": {
-      "get": {
-        "tags": ["Public"],
-        "summary": "Get albums from jsonplaceholder.",
-        "description": "Retrieve albums from the jsonplaceholder API.\n\n**Example Authorization Header:**\n```\nx-api-key: 7d0b2d51-ec70-4076-b02f-109244432a28 (universal key with limited access)\n```\n",
-        "responses": {
-          "200": {
-            "description": "Successful response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": "// Define properties based on your response"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/jsonplaceholder/photos": {
-      "get": {
-        "tags": ["Public"],
-        "summary": "Get photos from jsonplaceholder.",
-        "description": "Retrieve photos from the jsonplaceholder API.",
-        "responses": {
-          "200": {
-            "description": "Successful response",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": "// Define properties based on your response"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/status": {
-      "get": {
-        "tags": ["Health"],
         "summary": "Get health of Content Gateway as status.",
-        "description": "Retrieve status information.\n\n**Example Authorization Header:**\n```\nx-api-key: 7d0b2d51-ec70-4076-b02f-109244432a28 (universal key with limited access)\n```\n",
+        "description": "Retrieve status information.\n\n**Example Authorization Header:**\n```\nx-api-key: 7d0b2d51-ec70-4076-b02f-109244432a28 (public key with limited access)\n```\n",
         "responses": {
           "200": {
             "description": "Successful response",
@@ -120,61 +56,24 @@
               }
             }
           },
-          "400": {
-            "description": "Bad Request",
+          "403": {
+            "description": "Forbidden",
             "content": {
               "application/json": {
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "error": {
-                      "type": "string",
-                      "description": "A description of the error"
-                    }
-                  }
+                "status": {
+                  "type": "integer",
+                  "example": 403,
+                  "description": "HTTP status code"
+                },
+                "auth": {
+                  "type": "string",
+                  "example": "access denied",
+                  "description": "Error message indicating access is denied"
                 }
-              }
-            }
-          },
-          "401": {
-            "description": "Unauthorized",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "status": {
-                      "type": "integer",
-                      "description": "The HTTP status code",
-                      "example": 401
-                    },
-                    "auth": {
-                      "type": "boolean",
-                      "description": "Authentication status",
-                      "example": false
-                    },
-                    "error": {
-                      "type": "string",
-                      "description": "Details about the unauthorized request",
-                      "example": "Authentication failed"
-                    }
-                  }
                 }
-              }
-            }
-          },
-          "404": {
-            "description": "Not Found",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "properties": {
-                    "error": {
-                      "type": "string",
-                      "description": "Details about the resource not being found"
-                    }
-                  }
                 }
               }
             }
@@ -205,27 +104,11 @@
         "description": "# API Description\n\nThis API serves as a gateway with limited functionalities. API key is required for authentication, and it must be requested from an admin.\n\n## Changelog\n\n### Version 1.0.0\n- Added user endpoint\n- Added product endpoint\n- Introduced API key authentication\n\n### Version 1.1.0\n- Updated user endpoint to include additional information\n- Bug fixes"
 
     },
-    "/portal/allfiles": {
+    "/portal/filestoparse": {
       "get": {
         "tags": ["Content Portal"],
-        "parameters": [
-          {
-            "name": "max",
-            "in": "query",
-            "required": false,
-            "type": "integer",
-            "description": "max amount of files"
-          },
-          {
-            "name": "sortAlphabetically",
-            "in": "query",
-            "description": "Sort results alphabetically",
-            "required": false,
-            "type": "boolean"
-          }
-        ],
-        "summary": "Get all Files from Content Portal",
-        "description": "Retrieve photos from the jsonplaceholder API.",
+        "summary": "grab all files to parse (status: 0)",
+        "description": "Retrieve info about all files from the Portal.\n\n**Example Authorization Header:**\n```\nx-api-key: YOUR-API-KEY\n```\n",
         "responses": {
           "200": {
             "description": "Successful response",
@@ -234,6 +117,102 @@
                 "schema": {
                   "type": "object",
                   "properties": "// Define properties based on your response"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/portal/newfiles": {
+      "get": {
+        "tags": ["Content Portal"],
+        "parameters": [
+          {
+            "name": "title",
+            "in": "query",
+            "required": false,
+            "type": "string",
+            "description": "entry be like"
+          }
+        ],
+        "summary": "check for new files to be uploaded to the Portal",
+        "description": "Retrieve info about all files from the Portal.\n\n**Example Authorization Header:**\n```\nx-api-key: YOUR-API-KEY\n```\n",
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "example": 200,
+                      "description": "HTTP status code"
+                    },
+                    "duration": {
+                      "type": "string",
+                      "example": "5 ms",
+                      "description": "Duration of the operation"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "OK - New files waiting for upload",
+                      "description": "Message indicating the success status"
+                    },
+                    "amount": {
+                      "type": "integer",
+                      "example": 1,
+                      "description": "Amount of files"
+                    },
+                    "result": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "title": {
+                            "type": "string",
+                            "example": "file.pdf",
+                            "description": "File title"
+                          },
+                          "sha": {
+                            "type": "string",
+                            "example": "f5b5b7d434ec9f8b69967ac8ca271b1c0724b0809e1e08125f7fddb2dc39c914",
+                            "description": "SHA256 hash of the file"
+                          },
+                          "size": {
+                            "type": "integer",
+                            "example": 87914,
+                            "description": "Size of the file in bytes"
+                          }
+                        }
+                      },
+                      "description": "Array containing information about the files"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                "status": {
+                  "type": "integer",
+                  "example": 403,
+                  "description": "HTTP status code"
+                },
+                "auth": {
+                  "type": "string",
+                  "example": "access denied",
+                  "description": "Error message indicating access is denied"
+                }
+                }
                 }
               }
             }

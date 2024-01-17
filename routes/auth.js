@@ -62,6 +62,13 @@ exports.host = async (req, res, next) => {
   next();
 }
 
+exports.path = async (req, res, next) => {
+const pathname = req._parsedUrl.pathname
+req.urlParts = pathname.split('/')
+req.request = req.urlParts[1]
+next();
+}
+
 /**
  * @param {request} req - The request object from the API.
  * @param {ExpressResponse} res - The response object.
@@ -78,9 +85,8 @@ exports.auth = async (req, res, next) => {
         case allowedKeys.includes(incomingApiKey):
           auth = true
           break
-        case (incomingApiKey === publicKey):
+        case (incomingApiKey === publicKey && req.request === 'public'):
           auth = true
-          req.public = true
           break
       }
     }
@@ -107,9 +113,7 @@ exports.auth = async (req, res, next) => {
  */
 exports.service = async (req, res, next) => {
   try {
-    const pathname = req._parsedUrl.pathname
-    const urlParts = pathname.split('/')
-    const request = urlParts[1]
+    const { urlParts, request } = req
     let authService = {} // Authenticated Service Route
     const contentRoute = configData.routes.find(route => route.path === request)
 
@@ -131,24 +135,21 @@ exports.service = async (req, res, next) => {
     }
 
     if (authService.title) req.title = authService.title
-
-    if (req.public && !authService.public) {
-      throw new CustomError('public Access denied', 401) // Unauthorized status code
-    }
-
     if (authService.curl) req.curl = authService.curl
-    req.command = contentRoute.path || authService.command || false
+    req.command = authService.command || contentRoute.path || false
     req.service = authService.serviceInstance || 'axios'
     req.transformations = authService.transformations || {}
     req.param = {}
     if (authService.parameter) {
       const params = authService.parameter
-      params.query.map(param => {
+      params.map(param => {
         if (req.query[param]) {
           req.param[param] = req.query[param]
         }
       })
     }
+    delete req.urlParts
+    delete req.request
     next()
   } catch (err) {
     console.log(err)
