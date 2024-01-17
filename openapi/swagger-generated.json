@@ -1,15 +1,48 @@
 {
   "openapi": "3.0.0",
   "info": {
-    "title": "API Gateway Swagger",
-    "version": "1.0.0",
-    "description": "API Gateway documentation"
+    "title": "Content Gateway API Swagger",
+    "version": "0.0.1",
+      "description": "This API serves as a gateway with limited functionalities.\n\n You can find working examples in the 'Public' segment, that can be accessed without auth.\n\nAPI key is required for authentication, and it must be requested from an admin.",
+      "contact": {
+      "name": "Your Organization",
+      "email": "admin@example.com"
+    }
   },
+    "tags": [
+    {
+      "name": "Public",
+      "description": "Working examples with limited return"
+    },
+    {
+      "name": "Health",
+      "description": "Health and Status"
+    },
+    {
+      "name": "Content Portal",
+      "description": "Special Tasks for the Portal"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "apiKeyAuth": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "x-api-key"
+      }
+    }
+  },
+  "security": [
+    {
+      "apiKeyAuth": []
+    }
+  ],
   "paths": {
     "/jsonplaceholder/comments": {
       "get": {
+        "tags": ["Public"],
         "summary": "Get comments from jsonplaceholder.",
-        "description": "Retrieve comments from the jsonplaceholder API.",
+        "description": "Retrieve comments from the jsonplaceholder API.\n\n**Example Authorization Header:**\n```\nx-api-key: 7d0b2d51-ec70-4076-b02f-109244432a28 (universal key with limited access)\n```\n",
         "responses": {
           "200": {
             "description": "Successful response",
@@ -27,8 +60,9 @@
     },
     "/jsonplaceholder/albums": {
       "get": {
+        "tags": ["Public"],
         "summary": "Get albums from jsonplaceholder.",
-        "description": "Retrieve albums from the jsonplaceholder API.",
+        "description": "Retrieve albums from the jsonplaceholder API.\n\n**Example Authorization Header:**\n```\nx-api-key: 7d0b2d51-ec70-4076-b02f-109244432a28 (universal key with limited access)\n```\n",
         "responses": {
           "200": {
             "description": "Successful response",
@@ -46,6 +80,7 @@
     },
     "/jsonplaceholder/photos": {
       "get": {
+        "tags": ["Public"],
         "summary": "Get photos from jsonplaceholder.",
         "description": "Retrieve photos from the jsonplaceholder API.",
         "responses": {
@@ -65,8 +100,132 @@
     },
     "/status": {
       "get": {
-        "summary": "Get status.",
-        "description": "Retrieve status information.",
+        "tags": ["Health"],
+        "summary": "Get health of Content Gateway as status.",
+        "description": "Retrieve status information.\n\n**Example Authorization Header:**\n```\nx-api-key: 7d0b2d51-ec70-4076-b02f-109244432a28 (universal key with limited access)\n```\n",
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "description": "The status of the operation"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "description": "A description of the error"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "description": "The HTTP status code",
+                      "example": 401
+                    },
+                    "auth": {
+                      "type": "boolean",
+                      "description": "Authentication status",
+                      "example": false
+                    },
+                    "error": {
+                      "type": "string",
+                      "description": "Details about the unauthorized request",
+                      "example": "Authentication failed"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "description": "Details about the resource not being found"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string",
+                      "description": "Details about the internal server error"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "apiKeyAuth": []
+          }
+        ]
+      },
+        "description": "# API Description\n\nThis API serves as a gateway with limited functionalities. API key is required for authentication, and it must be requested from an admin.\n\n## Changelog\n\n### Version 1.0.0\n- Added user endpoint\n- Added product endpoint\n- Introduced API key authentication\n\n### Version 1.1.0\n- Updated user endpoint to include additional information\n- Bug fixes"
+
+    },
+    "/portal/allfiles": {
+      "get": {
+        "tags": ["Content Portal"],
+        "parameters": [
+          {
+            "name": "max",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "description": "max amount of files"
+          },
+          {
+            "name": "sortAlphabetically",
+            "in": "query",
+            "description": "Sort results alphabetically",
+            "required": false,
+            "type": "boolean"
+          }
+        ],
+        "summary": "Get all Files from Content Portal",
+        "description": "Retrieve photos from the jsonplaceholder API.",
         "responses": {
           "200": {
             "description": "Successful response",
@@ -82,7 +241,5 @@
         }
       }
     }
-  },
-  "components": {},
-  "tags": []
+  }
 }

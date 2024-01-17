@@ -6,36 +6,34 @@ module.exports = class {
                 resolve({
                     data: {},
                     status: 200,
-                    message: 'data service reply'
+                    message: 'data service reply timeout'
                 })
             }, 200)
         })
     }
 
     /** @param {requestInput} requestInput */
-    status = async (requestInput) => {
-        const message = 'the status request of the API-Gateway was successful.'
+    status = async () => {
         /** @type {ApiResponseInner} */
         return {
             data: {},
             status: 200,
-            message
+            message: 'the status request of the API-Gateway was successful.'
         }
     }
 
     /** @param {requestInput} requestInput */
-    result = async (requestInput) => {
-        const message = 'Example result'
+    result = async () => {
         /** @type {ApiResponseInner} */
         return {
             data: [{result: true}],
             status: 200,
-            message
+            message: 'Example result'
         }
     }
 
     /** @param {requestInput} requestInput */
-    requestMissing = async (requestInput) => {
+    requestMissing = async () => {
         /** @type {ApiResponseInner} */
         return {
             data: {},

@@ -1,20 +1,22 @@
 // jsdocs
 
-
-/**
- * @typedef {Object} ApiResponseInner
- * @property {object} data - The response data (you can specify a more specific type here if known).
- * @property {number} status - The HTTP status code.
- * @property {string} [message] - A message associated with the response.
- */
-
 /**
  * @typedef {Object} ApiResponse
- * @property {object} data - The response data (you can specify a more specific type here if known).
+ * @property {object|Array<any>} data - The response data (you can specify a more specific type here if known).
  * @property {number} status - The HTTP status code.
- * @property {string} statusText - The HTTP status text.
- * @property {string} [message] - A message associated with the response.
+ * @property {string} [message] - The HTTP status text.
+ * @property {string} [elapsedTime]
  */
+
+/**
+ * @typedef {Object} ApiReturn
+ * @property {number} status
+ * @property {Array<any>} result
+ * @property {string} message
+ * @property {string} [worker]
+ * @property {number} [amount]
+ * @property {string} [duration]
+*/
 
 /**
  * @typedef {Object} request
@@ -27,14 +29,12 @@
  * @property {string} url
  * @property {string} [curl]
  * @property {string} request
+ * @property {object} [param]
  * @property {string} [title]
+ * @property {object} [transformations]
+ * @property {ApiReturn} rawdata
  */
 
-/**
- * @typedef {Object} apiOutputData
- * @property {object} data
- * @property {number} status
- */
 
 /**
  * @typedef {Object} requestInput
@@ -43,6 +43,8 @@
  * @property {object} [body]
  * @property {string} [curl]
  * @property {string} [request]
+ * @property {string} [command]
+ * @property {string} [service]
  */
 
 /**

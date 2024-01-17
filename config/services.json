@@ -1,24 +1,10 @@
 {
     "routes": [
         {
-            "path": "many_requests",
-            "services": {
-                 "one": {
-                    "title": "grab what",
-                    "method": "GET",
-                    "serviceInstance": "axios",
-                    "command": "content",
-                    "curl": "internal",
-                    "transformations": {
-                        "output": "xlsx"
-                    }
-                }
-            }
-        },
-        {
             "path": "jsonplaceholder",
             "services": {
                  "comments": {
+                    "public": true,
                     "title": "grab comments from jsonplaceholder",
                     "method": "GET",
                     "serviceInstance": "axios",
@@ -29,6 +15,7 @@
                     }
                 },
                 "albums": {
+                    "public": true,
                     "title": "grab albums from jsonplaceholder",
                     "method": "GET",
                     "serviceInstance": "axios",
@@ -39,6 +26,7 @@
                     }
                 },
                 "photos": {
+                    "public": true,
                     "title": "grab photos from jsonplaceholder",
                     "method": "GET",
                     "serviceInstance": "axios",
@@ -54,6 +42,7 @@
             "path": "status",
             "services": {
                  "def": {
+                    "public": true,
                     "method": "GET",
                     "serviceInstance": "status",
                     "command": "status",
@@ -63,12 +52,60 @@
             }
         },
         {
-            "path": "result",
+            "path": "filestorage",
             "services": {
                  "def": {
+                    "public": true,
+                    "method": "POST",
+                    "serviceInstance": "files",
+                    "curl": false,
+                    "transformations": {}
+                    }
+            }
+        },
+        {
+            "path": "checkfornewfileandupload",
+            "services": {
+                 "def": {
+                    "public": false,
                     "method": "GET",
-                    "serviceInstance": "status",
-                    "command": "result",
+                    "serviceInstance": "files",
+                    "curl": false,
+                    "transformations": {}
+                    }
+            }
+        },
+        {
+            "path": "checkfornewfileandparse",
+            "services": {
+                 "def": {
+                    "public": true,
+                    "method": "GET",
+                    "serviceInstance": "files",
+                    "curl": false,
+                    "transformations": {}
+                    }
+            }
+        },
+        {
+            "path": "checkforfilestoparse",
+            "services": {
+                 "def": {
+                    "public": true,
+                    "method": "GET",
+                    "serviceInstance": "files",
+                    "curl": false,
+                    "transformations": {}
+                    }
+            }
+        },
+        {
+            "path": "longtask",
+            "services": {
+                 "def": {
+                    "public": true,
+                    "method": "GET",
+                    "serviceInstance": "files",
                     "curl": false,
                     "transformations": {}
                     }

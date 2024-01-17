@@ -1,25 +1,44 @@
-const Connection = require('./DBConnections');
-const _con = new Connection();
-const mongoose = require('mongoose');
-// const DATES = require('../Dates');
-// const DT = new DATES();
+const { _con } = require('./DBConnections');
 const mno = require('mongoose-operations')
-const mongooseOperations = new mno()
+const mongooseOperations = new mno();
 
 module.exports = class {
 
-  createToken = async () => await mongooseOperations.create({ token: '123', service: 'first API'}, _con.useMongo())
-  
-  /** @param {object} match*/
-  find = async (match) => await mongooseOperations.findAllFields(match, _con.useMongo())
+  createOrUpdate = async(entry,con) => {
+    let res = await mongooseOperations.create(entry, _con(con))
+    if ('e' in res && res.e === 11000) {
+      const set = { $set: entry }
+      const updateID = res._id
+      const { _id } = await _con(con).findByIdAndUpdate(updateID, set)
+      return { status: 201, _id: _id.toString() }
+    }
+    return { status: 200, _id: res._id.toString() }
+  }
 
-  /**
-   * @param {Object} params - The parameters object.
-   * @param {Object} params.match - The match criteria for the query.
-   * @param {Object} params.projects - The project details.
-   */
-  findOneByProject = async ({ match, projects }) => await mongooseOperations.findOneByProject(match, projects, _con.useMongo())
-  
-  findGRIContent = async ({ match, projects }) => await mongooseOperations.findManyByProject(match, projects, _con.useGRI())
+  findAllFields = async (match, con) => {
+    try {
+      const AGGREGATE = [
+        { $match: match },
+        { $addFields: {} }
+      ]
+      return await _con(con).aggregate((AGGREGATE))
+    } catch (error) {
+      return { status: error.status || 500, error: error.message || "Internal Server Error" };
+    }
+  }
+
+  findSpecificFields = async (match, con, projects) => {
+    try {
+      const AGGREGATE = [
+        { $match: match },
+        { $sort: { _id: -1 } },
+        { $project: projects }
+      ]
+      return await _con(con).aggregate((AGGREGATE))
+    } catch (error) {
+      return { status: error.status || 500, error: error.message || "Internal Server Error" };
+    }
+  }
+
 
 }

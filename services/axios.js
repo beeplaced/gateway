@@ -1,9 +1,30 @@
 const axios = require('axios');
-const FileService = require('./FileService'); const FILES = new FileService();
-const ContentService = require('./ContentService'); const Content = new ContentService();
 const CustomError = require('../types/customError')
 
 module.exports = class {
+
+    /** @param {requestInput} requestInput */
+    fileToPortal = async requestInput => {
+        //console.log('requestInput', requestInput)
+        const { body, apiUrl } = requestInput
+        const headers = { 'x-api-key': `68bde212-039e-4247-9934-654e358fed18` };
+        try {
+            /** @type {object} */
+            let response = {}
+            const postData = body || {};
+            response = await axios.post(apiUrl, postData, { headers });
+            /** @type {ApiResponseInner} */
+            const ApiResponseInner = {
+                data: response.data || false,
+                status: response.status || 300,
+            }
+            if (response.message) ApiResponseInner.message = response.message
+            return ApiResponseInner
+        } catch (err) {
+            const msg = err.code || 'An error occurred while processing the request.'
+            throw new Error(msg);
+        }
+    }
 
     /** @param {requestInput} requestInput */
     suppliermail = async requestInput => {
@@ -90,7 +111,6 @@ module.exports = class {
             const ApiResponseInner = {
                 data: response.data || false,
                 status: response.status || 300,
-                //statusText: response.statusText || 'something went wrong',
             }
             if (response.message) ApiResponseInner.message = response.message
             return ApiResponseInner
@@ -110,7 +130,6 @@ module.exports = class {
             const ApiResponseInner = {
                 data: response.data || false,
                 status: response.status || 300,
-                message: 'everything worked fine'
             }
             if (response.message) ApiResponseInner.message = response.message
             return ApiResponseInner

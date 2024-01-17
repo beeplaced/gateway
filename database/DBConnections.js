@@ -1,71 +1,51 @@
-
 // console.log('db connection')
 const mongoose = require('mongoose'); mongoose.set('strictQuery', true);
 const Schema = mongoose.Schema;
 const { connectToMongoDB } = require('./DBConnect');
-const Table = 'gri_latest';
-const db = connectToMongoDB();
-
-const DBConnect = () => {
-  if (!mongoose.connection.readyState) {
-    return connectToMongoDB()
+const connections = connectToMongoDB();
+const DBConnect = (database = process.env.MONGODATABASE) => {
+  if (!Object.keys(connections).includes(database)){
+    return connectToMongoDB(database)[database]
   }
-  return db
+  return connections[database]
 }
 
-const griContent = new Schema(
-    {
-      ident: {
-        type: String,
-        required: true,
-      },
-      sort: {
-        type: Number,
-        required: true
-      },
-      tab: {
-        type: String,
-        required: true,
-      },
-      standard: {
-        type: String
-      },
-      identifier: {
-        type: String,
-        required: true
-      },
-      catalog: {
-        type: Object,
-        required: false
-      },
-      gri: {
-        type: Object,
-        required: true
-      },
-      status: { type: Object, required: true },
-      packages: { type: Array, required: false },
-      metadata: {
-        type: {
-          _id: false,
-          lastUpdate: { type: Date, required: true },
-          lang: { type: String, required: false },
-          country: { type: String, required: false }
-        },
-        required: false
-      },
-  }, { strict: false }); griContent.index({ ident: 1 }, { unique: true })
+const schemata = {}
 
-// const token = new Schema({
-//   _id: { type: mongoose.Schema.Types.ObjectId, required: true },
-//   token: { type: String, required: true },
-//   service: { type: String, required: true },
-//   remark: { type: String, required: false },
-//   }, { versionKey: false, collection: Table })
-//   //packageMeta.index({ title: 1 }, { unique: true })
-
-module.exports = class {
-  useGRI = () => DBConnect().model(
-    Table,
-    griContent,
-    Table)
+const definitions = {
+  files: () => {
+    return {
+      sch: {
+        title: { type: String, required: true },
+        status: { type: Number, required: true, default: 0 }, //def. uploaded, new
+        sha: { type: String, required: true, unique: true },
+        lastUpdate: { type: Date, required: true, default: Date.now  },
+        size: { type: Number, required: false },
+        file: {
+          data: Buffer,
+          contentType: String
+        }
+      }, index: { sha: 1 }
+    }
+  },
+  msdsd: () => {
+    return {
+      sch: {
+        index: { type: String, required: true },
+        status: { type: Object, required: true }
+      }
+    }
+  }
 }
+
+exports._con = (collection) => {
+    if (!schemata[collection]) {
+      const { sch, index } = definitions[collection]()
+      schemata[collection] = new Schema(sch, { collection, versionKey: false, strict: false });
+      if (index) schemata[collection].index(index, { unique: true })
+    }
+    return DBConnect().model(
+      `${collection}`,
+      schemata[collection],
+      `${collection}`,)  
+    }

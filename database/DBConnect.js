@@ -1,31 +1,21 @@
-
-/** @type {string} */
-const ENVIRONMENT = 'dev';
-const DATABASE = process.env.MONGODATABASE;
-
-const dbURI = ENVIRONMENT === 'live'
-  ? `mongodb://${process.env.MONGO_USER}:${process.env.MONGO_PASS}@${process.env.MONGO_SERVER}:${process.env.MONGO_PORT}/${process.env.MONGO_DB}?authSource=admin`
-  : `mongodb://localhost:${process.env.MONGOPORT}/${DATABASE}`;
+const dbURIDef = process.env.ENVIRONMENT === 'live'
+  ? `mongodb://${process.env.MONGO_USER}:${process.env.MONGO_PASS}@${process.env.MONGO_SERVER}:${process.env.MONGO_PORT}/${process.env.MONGODATABASE}?authSource=admin`
+  : `mongodb://localhost:${process.env.MONGOPORT}/${process.env.MONGODATABASE}`;
 
 let attempts = 0; const Maxattempts = 20; const ConnectTimeout = 10000;
+//const connectionOptions = { useNewUrlParser: true, useUnifiedTopology: true };
+const connectionOptions = {}
+const mongoose = require('mongoose');
+mongoose.set('strictQuery', true);
 
-/**
- * @typedef {Object} ConnectionOptions
- * @property {boolean} useNewUrlParser - Whether to use the new URL parser.
- * @property {boolean} useUnifiedTopology - Whether to use the new Server Discovery and Monitoring engine.
- */
+const connections = {}
 
-const connectionOptions /** @type {ConnectionOptions} */ = {
-  useNewUrlParser: true,
-  useUnifiedTopology: true
-};
-
-const mongoose = require('mongoose'); mongoose.set('strictQuery', true);
-
-const connectToMongoDB = () => {
+exports.connectToMongoDB = (database = process.env.MONGODATABASE) => {
   try {
-    mongoose.connect(dbURI, connectionOptions)
-    return mongoose.connection
+    if (!Object.keys(connections).includes(database)) {
+    connections[database] = mongoose.createConnection(dbURIDef, connectionOptions);
+    }
+    return connections
   } catch (error) {
     console.error('Error connecting to MongoDB:', error); attempts++
     if (attempts >= Maxattempts) {
@@ -36,4 +26,28 @@ const connectToMongoDB = () => {
   }
 }
 
-exports.connectToMongoDB = connectToMongoDB;
+// const ENVIRONMENT = 'dev';
+
+// const dbURIDef = `mongodb://localhost:${process.env.MONGOPORT}/${process.env.MONGODATABASE}`;
+
+// let attempts = 0; const Maxattempts = 20; const ConnectTimeout = 10000;
+// const connectionOptions = {}
+// const mongoose = require('mongoose');
+// mongoose.set('strictQuery', true);
+
+// const connections = {}
+
+// exports.connectToMongoDB = (database = 'fusion') => {
+//   try {
+//     const dbUriTry = `mongodb://localhost:${process.env.MONGOPORT}/${database}`;
+//     connections[database] = mongoose.createConnection(dbUriTry, connectionOptions);
+//     return connections
+//   } catch (error) {
+//     console.error('Error connecting to MongoDB:', error); attempts++
+//     if (attempts >= Maxattempts) {
+//       console.error(`Failed to connect to MongoDB after ${Maxattempts} attempts. Exiting...`)
+//       process.exit(1)
+//     }
+//     setTimeout(connectToMongoDB, ConnectTimeout)
+//   }
+// }
