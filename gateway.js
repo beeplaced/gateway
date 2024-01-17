@@ -14,7 +14,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(authenticate.host); // Host Control
 app.use(authenticate.path); // get Request path
-//app.use(authenticate.auth); // Authenticate on Basic or x-api-key
+app.use(authenticate.auth); // Authenticate on Basic or x-api-key
 app.use(authenticate.service); // Select and align Service for Request
 app.use(dist.services); // Apply Services and return value
 app.use(end.output); // Apply Services and return value

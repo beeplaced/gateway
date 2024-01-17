@@ -4,14 +4,12 @@ const hostLocker = require('host-locker')
 const hl = new hostLocker({
   maxCallThreshold: 10,
   secondsThreshold: 5,
-  allowedHosts: ['localhost']
+  allowedHosts: process.env.ALLOWED_HOSTS.split(',')
 })
 const allowedKeys = process.env.ALLOWED_KEYS.split(',')
 const publicKey = process.env.PUBLIC_KEY
 const { URL } = require('url')
 const configData = grabConfig()
-
-
 
 /** Decodes and validates Basic Authentication credentials.
  * @param {string} encodedCredentials - The encoded credentials in the format 'Basic base64(username:password)'.
