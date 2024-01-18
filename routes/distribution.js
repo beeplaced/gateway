@@ -29,7 +29,7 @@ const statusTitles = {
 exports.services = async function (req, res, next) {
 
   const { command } = req
-
+  console.log(command)
   if (command in running) {
     switch (true) {
       case running[command] === true:
@@ -130,6 +130,7 @@ const prepOutput = (response) => {
  * @param {ExpressResponse} res
 */
 const outputError = (err, res) => {
+  console.log('here')
   const message = err.message
   res.status(err?.status).json({
     data: {

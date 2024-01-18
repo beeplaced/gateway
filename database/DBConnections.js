@@ -35,7 +35,27 @@ const definitions = {
         status: { type: Object, required: true }
       }
     }
+  },
+  presBackup: () => {
+    return {
+      sch: {
+        parserres: {
+          type: Object,
+          required: true
+        },
+        sha: {
+          type: String,
+          required: true,
+          unique: true
+        },
+        synced: {
+          type: Date,
+          required: false
+        }
+      }, index: { sha: 1 }
+    }
   }
+
 }
 
 exports._con = (collection) => {

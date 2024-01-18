@@ -13,12 +13,44 @@
                  "newfiles": {
                     "title": "check for new files to be uploaded",
                     "method": "GET",
-                    "serviceInstance": "files",
+                    "serviceInstance": "portal",
                     "command": "newfiles",
                     "parameter": ["title"],
                     "transformations": {}
+                },
+                "uploadnewfiles": {
+                    "title": "check for new files and upload to the portal",
+                    "method": "GET",
+                    "serviceInstance": "files",
+                    "command": "uploadnewfiles",
+                    "parameter": ["title"],
+                    "transformations": {}
+                },
+                "checkfilestoparse": {
+                    "title": "check for new files to parse",
+                    "method": "GET",
+                    "serviceInstance": "portal",
+                    "command": "checkfilestoparse",
+                    "transformations": {}
+                },
+                "checknewfileandparse": {
+                    "title": "check for new files and parse in the background",
+                    "method": "GET",
+                    "serviceInstance": "files",
+                    "command": "checknewfileandparse",
+                    "auth": "cron_key",
+                    "transformations": {}
+                },
+                "readparseres": {
+                    "title": "check for new files and parse in the background",
+                    "method": "GET",
+                    "serviceInstance": "portal",
+                    "command": "readparseres",
+                    "parameter": ["supplier name","trade name"],
+                    "auth": "released_keys",
+                    "transformations": {}
                 }
-            }            
+            }   
         },
         {
             "path": "public",
@@ -45,18 +77,6 @@
             }
         },
         {
-            "path": "checkfornewfileandupload",
-            "services": {
-                 "def": {
-                    "public": false,
-                    "method": "GET",
-                    "serviceInstance": "files",
-                    "curl": false,
-                    "transformations": {}
-                    }
-            }
-        },
-        {
             "path": "checkfornewfileandparse",
             "services": {
                  "def": {
@@ -68,18 +88,7 @@
                     }
             }
         },
-        {
-            "path": "checkforfilestoparse",
-            "services": {
-                 "def": {
-                    "public": true,
-                    "method": "GET",
-                    "serviceInstance": "files",
-                    "curl": false,
-                    "transformations": {}
-                    }
-            }
-        },
+
         {
             "path": "longtask",
             "services": {

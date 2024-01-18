@@ -52,8 +52,10 @@ module.exports = class {
     } catch (e) { console.log(e) }
   }
 
-  checkfornewfileandupload = async () => {
-    const match = { _id: { $exists: true }, status: 0  }
+  uploadnewfiles = async () => {
+    const match = { _id: { $exists: true }, 
+    //status: 0  
+  }
     const con = 'files'
     const projects = {
       title: 1, sha: 1
@@ -89,42 +91,13 @@ module.exports = class {
   return ApiResponse
   }
 
-  newfiles = async (requestInput) => {
-    let match = { _id: { $exists: true } }
-    match.status = 0
-    if (requestInput.param){
-      Object.keys(requestInput.param).map(p => {
-        match[p] = { $regex: requestInput.param[p], $options: 'i' }
-      })
-    }
-    const con = 'files'
-    const projects = {
-      _id: 0,
-      title: 1, sha: 1, size: 1
-    }
-    const files = await _DB.findSpecificFields(match, con, projects)
-    /** @type {ApiResponse} */
-    let ApiResponse = {
-      data: [],
-      status: 200,
-      message: ''
-    }
-
-    if (files.length === 0) {
-      ApiResponse.message = 'No files to available'
-      return ApiResponse
-    }
-
-    ApiResponse.data = files
-    ApiResponse.status = 200
-    ApiResponse.message = 'New files waiting for upload'
-    return ApiResponse
+  checknewfileandparse = async() => {
+    const match = { _id: { $exists: true }, 
+//    status: { status: 1 } 
   }
-
-  checkfornewfileandparse = async() => {
-    const match = { _id: { $exists: true }, status: { status: 0 } }
       const con = 'msdsd'
       const projects = {
+        _id: { $toString: "$_id" },
         status: 1
       }
       const files = await _DB.findSpecificFields(match, con, projects)
@@ -140,54 +113,16 @@ module.exports = class {
       ApiResponse.message = 'No files to parse'
       return ApiResponse
     }
-
-    ApiResponse.data = await Promise.all(files.map(async file => {
-      const { _id } = file;
-      try {
-        const upFile = await _axios.fileToPortal({
-          apiUrl: `http://localhost:5000/gateway/parse`,
-          body: {
-            rowID: _id.toString(),
-            settings: { parserbackup: 1, simthresholdhigh: 1 } }
-        });
-        return upFile.data
-      } catch (err) {
-        return { status: 300, err: err.message, file: file.title };
-      }
-    }));
-
+    ApiResponse.data = await _axios.fileToPortal({
+      apiUrl: `http://localhost:5000/gateway/parselong`,
+      body: files.map(f => {
+          return {
+            rowID: f._id, settings: { parserbackup: 1, simthresholdhigh: 1 }
+          }
+        })
+    });
     ApiResponse.status = 200
     ApiResponse.message = 'Content Portal Parser API'
-    return ApiResponse
-  }
-
-  filestoparse = async () => {
-    const match = { _id: { $exists: true }, status: { status: 0 }
-   }
-    const con = 'msdsd'
-    const projects = {
-      _id: { $toString: "$_id" },
-      index: 1, 
-      status: 1 
-    }
-    const files = await _DB.findSpecificFields(match, con, projects)
-
-    /** @type {ApiResponse} */
-    let ApiResponse = {
-      data: [],
-      status: 200,
-      message: ''
-    }
-
-    if (files.length === 0) {
-      ApiResponse.message = 'No files to parse'
-      return ApiResponse
-    }
-
-    ApiResponse.data = files
-
-    ApiResponse.status = 200
-    ApiResponse.message = 'Content Portal - grab all files to parse (status: 0)'
     return ApiResponse
   }
 

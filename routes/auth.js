@@ -6,8 +6,10 @@ const hl = new hostLocker({
   secondsThreshold: 5,
   allowedHosts: process.env.ALLOWED_HOSTS.split(',')
 })
-const allowedKeys = process.env.ALLOWED_KEYS.split(',')
+
+const releasedKeys = process.env.RELEASED_KEYS.split(',')
 const publicKey = process.env.PUBLIC_KEY
+const cronKey = process.env.CRON_KEY //For Cron Task only
 const { URL } = require('url')
 const configData = grabConfig()
 
@@ -60,39 +62,30 @@ exports.host = async (req, res, next) => {
   next();
 }
 
-exports.path = async (req, res, next) => {
-const pathname = req._parsedUrl.pathname
-req.urlParts = pathname.split('/')
-req.request = req.urlParts[1]
-next();
-}
-
 /**
  * @param {request} req - The request object from the API.
  * @param {ExpressResponse} res - The response object.
  * @param {*} next
  */
 exports.auth = async (req, res, next) => {
+  const incomingApiKey = req.headers['x-api-key']
+  const incomingAuth = req.headers.authorization
+
   try {
-    let auth = false
-    const incomingApiKey = req.headers['x-api-key']
-    const incomingAuth = req.headers.authorization
+  console.log('req.auth',req.auth)
+  console.log(incomingApiKey)
+  let auth = false
 
-    if (incomingApiKey) {
-      switch (true) {
-        case allowedKeys.includes(incomingApiKey):
-          auth = true
-          break
-        case (incomingApiKey === publicKey && req.request === 'public'):
-          auth = true
-          break
-      }
-    }
-
-    if (incomingAuth && !incomingApiKey) {
+  switch (true) {
+    case req.auth === 'cron_key' && cronKey === incomingApiKey:
+    case req.auth === 'released_keys' && releasedKeys.includes(incomingApiKey):
+    case req.auth === 'public_key' && publicKey === incomingApiKey:
+      auth = true
+      break;
+    case incomingAuth && !incomingApiKey:
       auth = await decodeAuth(incomingAuth)
-    }
-
+      break;
+  }
     if (!auth) {
       throw new CustomError('Authentication failed', 401) // Unauthorized status code
     }
@@ -111,29 +104,19 @@ exports.auth = async (req, res, next) => {
  */
 exports.service = async (req, res, next) => {
   try {
-    const { urlParts, request } = req
+    const pathname = req._parsedUrl.pathname
+    const urlParts = pathname.split('/')
+    const request = urlParts[1]
     let authService = {} // Authenticated Service Route
     const contentRoute = configData.routes.find(route => route.path === request)
-
-    if (!contentRoute) {
-      throw new CustomError('request Missing', 401) // Unauthorized status code
-    }
-
-    if (urlParts[2] && contentRoute.services[urlParts[2]]) {
-      console.log('many', contentRoute.services[urlParts[2]])
-      authService = contentRoute.services[urlParts[2]]
-    }
-
-    if (contentRoute.services && !urlParts[2]) {
-      authService = contentRoute.services.def
-    }
-
-    if (!authService) {
-      throw new CustomError('request Missing', 401) // Unauthorized status code
-    }
-
+    if (!contentRoute) throw new CustomError('request Missing', 401) // Unauthorized status code
+    if (urlParts[2] && contentRoute.services[urlParts[2]]) authService = contentRoute.services[urlParts[2]]
+    if (contentRoute.services && !urlParts[2]) authService = contentRoute.services.def
+    //Empty Object????????????????!!!!!!!!!!!!!!!!!
+    if (!authService) throw new CustomError('request Missing', 401) // Unauthorized status code
     if (authService.title) req.title = authService.title
     if (authService.curl) req.curl = authService.curl
+    req.auth = authService.auth || 'released_keys'
     req.command = authService.command || contentRoute.path || false
     req.service = authService.serviceInstance || 'axios'
     req.transformations = authService.transformations || {}
@@ -146,8 +129,6 @@ exports.service = async (req, res, next) => {
         }
       })
     }
-    delete req.urlParts
-    delete req.request
     next()
   } catch (err) {
     console.log(err)

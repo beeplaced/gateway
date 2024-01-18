@@ -8,7 +8,6 @@ exports.output = async (req, res) => {
 
   const { command, rawdata } = req
 
-  //console.log(Object.keys(req))
   switch (command) {
     default:
       res.status(rawdata.status).json(rawdata)
