@@ -1,35 +1,20 @@
-const CustomError = require('../types/customError')
-const WorkerPool = require('worker-pool-task-queue')
-const TaskPool = new WorkerPool(poolSize = 2, './routes/queue.js', maxWorkers = 10, returnWorker = true)
-const { uploadFileChunk } = require('./upload')
-const running = { longtask: false }
+const CustomError = require('../types/customError');
+const WorkerPool = require('worker-pool-task-queue');
+const TaskPool = new WorkerPool(poolSize = 2, './routes/queue.js', maxWorkers = 10, returnWorker = true);
+const { uploadFileChunk } = require('./upload');
+const running = { longtask: false };
+const { output, prepOutput, outputError } = require('./output');
+const DBOPERATIONS = require('../database/DBOperations'); const _DB = new DBOPERATIONS();
 
-/** @type {statusTitles} */
-const statusTitles = {
-  200: 'OK',
-  201: 'Created',
-  202: 'Accepted',
-  204: 'No Content',
-  205: 'No Files available',
-  300: 'An error occured',
-  301: 'No API Route defined',
-  400: 'Bad Request',
-  401: 'Unauthorized',
-  403: 'Forbidden',
-  404: 'Not Found',
-  405: 'Method Not Allowed',
-  409: 'already running',
-  500: 'Internal Server Error'
-}
 /**
  * @param {request} req - The request object from the API.
  * @param {ExpressResponse} res - The response object.
  */
-
 exports.services = async function (req, res, next) {
+  const { headers, authService, body = false, param=false } = req
+  const { method, serviceInstance, command, curl } = authService
+  const service = serviceInstance || 'axios'
 
-  const { command } = req
-  console.log(command)
   if (command in running) {
     switch (true) {
       case running[command] === true:
@@ -38,7 +23,6 @@ exports.services = async function (req, res, next) {
         }
       next();
       return;
-    
       default:
         running[command] = true
         break;
@@ -46,47 +30,43 @@ exports.services = async function (req, res, next) {
   }
 
   if (!req || !res) throw new CustomError('nope!', 401)
-  /** @type {string} */
-  if (emptyString(req.command)) throw new CustomError('command missing', 401)
+  /** @type {string} */ if (emptyString(command)) throw new CustomError('command missing', 401)
 
   switch (true) {
-    case req.command === 'filestorage':
+    case command === 'filestorage':
       try {
         const startTime = new Date()
         /** @type {ApiResponse} */ const innerResponse = await uploadFileChunk(req, res)
+        console.log('innerResponse',innerResponse)
         const endTime = new Date()
         innerResponse.elapsedTime = `${endTime - startTime} ms`
-        /** @type {ApiReturn} */ const prep = prepOutput(innerResponse)
-        output(prep, req.command, res)
+        /** @type {ApiReturn} */ req.rawdata = prepOutput(innerResponse)
+        output(req, res)
       } catch (err) {
         outputError(err, res)
       }
       break
     default:
-    /** @type {requestInput} */
-      const requestInput = {
-        headers: req.headers,
-        method: req.method,
-        service: req.service,
-        command: req.command
-      }
-
-      if (req.body && !isEmptyObject(req.body)) requestInput.body = req.body
-      if (!isEmptyObject(req.param)) requestInput.param = req.param
-      if (req.curl) requestInput.curl = req.curl
-      if (req.command === 'forward') requestInput.request = req.url
+    /** @type {requestInput} */ const requestInput = { headers, method, service, command }
+      if (body && !isEmptyObject(body)) requestInput.body = body
+      if (param && !isEmptyObject(param)) requestInput.param = param
+      if (command === 'forward') requestInput.curl = curl
 
       const _inner = async () => {
         try {
           const startTime = new Date() // Record start time
           /** @type {ApiResponse} */ const innerResponse = await TaskPool.runTask(requestInput)
-          console.log(innerResponse)
           const endTime = new Date() // Record end time
           innerResponse.elapsedTime = `${endTime - startTime} ms`
           return prepOutput(innerResponse)
         } catch (err) {
           /** @type {*} */
           console.log(err)
+          await _DB.createOrUpdate({
+            log: {
+              err
+            }
+          }, 'gateway_logs')
           const error = err
           throw new CustomError(error.message, error.status || 500)
         }
@@ -100,44 +80,6 @@ exports.services = async function (req, res, next) {
         .catch(err => { outputError(err, res) })
       break
   }
-}
-
-const prepOutput = (response) => {
-  /** @type {ApiResponse} */ const { data, status, message, elapsedTime } = response
-  const statusText = status && statusTitles[status] ? statusTitles[status] : statusTitles[500]
-  let ret = {}
-  switch (status) {
-    case 200:
-    case 201:
-    case 409:
-      /** @type {ApiReturn} */ ret = {
-        status,
-        duration: `${elapsedTime} \u{1F60A}`,
-        message: message ? `${statusText} - ${message}` : statusText,
-      }
-      if (Array.isArray(data)) {
-        ret.amount = data.length
-      }
-      ret.result = data
-      return ret
-      default:
-      throw new CustomError(statusText, status || 500)
-  }
-}
-
-/**
- * @param {apiOutputError} err
- * @param {ExpressResponse} res
-*/
-const outputError = (err, res) => {
-  console.log('here')
-  const message = err.message
-  res.status(err?.status).json({
-    data: {
-      status: err?.status,
-      error: emptyString(message) ? 'Internal Server Error' : message
-    }
-  })
 }
 
 /** @param {string} string */

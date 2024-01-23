@@ -86,9 +86,9 @@ module.exports = class {
     /** @param {requestInput} requestInput */
     forward = async requestInput => {//GET //POST
         //console.log('requestInput', requestInput)
-        const { curl, request, method, body } = requestInput
-        if (!curl) throw new CustomError('curl missing', 405)
-        const apiUrl = `${curl}${request}`
+        const { curl, method, body=false } = requestInput
+        if (!curl || !method) throw new CustomError('parameter missing', 405)
+        const apiUrl = curl
         const authToken = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9"//j.buildJWT();
         const headers = { Authorization: `Bearer ${authToken}` };
         try {
@@ -102,8 +102,6 @@ module.exports = class {
                 case 'post':
                 const postData = body || {};
                 response = await axios.post( apiUrl, postData, { headers } );
-                break;
-                default: //to come
                 break;
             }
 
@@ -121,22 +119,4 @@ module.exports = class {
         }
     }
 
-    /** @param {requestInput} requestInput */
-    jsonplaceholder = async (requestInput) => {
-        let apiUrl = `https://jsonplaceholder.typicode.com/${requestInput.curl}`
-        try {
-            const response = await axios.get(apiUrl);
-            /** @type {ApiResponseInner} */
-            const ApiResponseInner = {
-                data: response.data || false,
-                status: response.status || 300,
-            }
-            if (response.message) ApiResponseInner.message = response.message
-            return ApiResponseInner
-        } catch (err) {
-            /** @type {*} */
-            const error = err
-            throw new CustomError(error.message, error.status || 500)
-        }
-    }
 }

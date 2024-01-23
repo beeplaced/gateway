@@ -1,6 +1,42 @@
 {
     "routes": [
         {
+            "path": "jsonplaceholder",
+            "services": {
+                 "comments": {
+                    "title": "forward test",
+                    "method": "GET",
+                    "serviceInstance": "axios",
+                    "command": "forward",
+                    "curl": "https://jsonplaceholder.typicode.com/comments",
+                    "auth": "test",
+                    "transformations": { }
+                },
+                "todos": {
+                    "title": "forward test",
+                    "method": "GET",
+                    "serviceInstance": "axios",
+                    "command": "forward",
+                    "curl": "https://jsonplaceholder.typicode.com/todos",
+                    "auth": "test",
+                    "transformations": { }
+                }
+            }
+        },
+            {
+            "path": "test",
+            "services": {
+                 "def": {
+                    "title": "test",
+                    "method": "GET",
+                    "serviceInstance": "status",
+                    "command": "test",
+                    "auth": "test",
+                    "transformations": { }
+                }
+            }
+        },
+            {
             "path": "portal",
             "services": {
                  "filestoparse": {

@@ -1,6 +1,6 @@
 module.exports = class {
 
-    apistatus = async () => {
+    test = async () => {
         return new Promise(resolve => {
             setTimeout(() => {
                 resolve({

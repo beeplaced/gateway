@@ -20,6 +20,7 @@ parentPort.on('message', async (requestInput) => {
         requestInput.command = 'requestMissing'
     }
     try {
+    console.log(command)
     const res = await serviceInstance[command](requestInput);
     parentPort.postMessage(res); 
     } catch (error) {

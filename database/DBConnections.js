@@ -28,6 +28,14 @@ const definitions = {
       }, index: { sha: 1 }
     }
   },
+  gateway_logs: () => {
+    return {
+      sch: {
+        log: { type: Object, required: true },
+        lastUpdate: { type: Date, required: true, default: Date.now },
+      }
+    }
+  },
   msdsd: () => {
     return {
       sch: {

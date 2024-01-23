@@ -36,7 +36,6 @@
  * @property {object} [transformations]
  */
 
-
 /**
  * @typedef {Object} requestInput
  * @property {object} headers

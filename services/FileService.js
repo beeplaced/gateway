@@ -93,8 +93,8 @@ module.exports = class {
 
   checknewfileandparse = async() => {
     const match = { _id: { $exists: true }, 
-//    status: { status: 1 } 
-  }
+    status: { status: 0 } 
+    }
       const con = 'msdsd'
       const projects = {
         _id: { $toString: "$_id" },
