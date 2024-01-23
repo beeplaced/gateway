@@ -1,17 +1,17 @@
-const CustomError = require('../types/customError');
-const WorkerPool = require('worker-pool-task-queue');
-const TaskPool = new WorkerPool(poolSize = 2, './routes/queue.js', maxWorkers = 10, returnWorker = true);
-const { uploadFileChunk } = require('./upload');
-const running = { longtask: false };
-const { output, prepOutput, outputError } = require('./output');
-const DBOPERATIONS = require('../database/DBOperations'); const _DB = new DBOPERATIONS();
+const CustomError = require('../types/customError')
+const WorkerPool = require('worker-pool-task-queue')
+const TaskPool = new WorkerPool(poolSize = 2, './routes/queue.js', maxWorkers = 10, returnWorker = true)
+const { uploadFileChunk } = require('./upload')
+const running = { longtask: false }
+const { output, prepOutput, outputError } = require('./output')
+const DBOPERATIONS = require('../database/DBOperations'); const _DB = new DBOPERATIONS()
 
 /**
  * @param {request} req - The request object from the API.
  * @param {ExpressResponse} res - The response object.
  */
 exports.services = async function (req, res, next) {
-  const { headers, authService, body = false, param=false } = req
+  const { headers, authService, body = false, param = false } = req
   const { method, serviceInstance, command, curl } = authService
   const service = serviceInstance || 'axios'
 
@@ -21,11 +21,11 @@ exports.services = async function (req, res, next) {
         req.rawdata = {
           status: 409
         }
-      next();
-      return;
+        next()
+        return
       default:
         running[command] = true
-        break;
+        break
     }
   }
 
@@ -37,7 +37,7 @@ exports.services = async function (req, res, next) {
       try {
         const startTime = new Date()
         /** @type {ApiResponse} */ const innerResponse = await uploadFileChunk(req, res)
-        console.log('innerResponse',innerResponse)
+        console.log('innerResponse', innerResponse)
         const endTime = new Date()
         innerResponse.elapsedTime = `${endTime - startTime} ms`
         /** @type {ApiReturn} */ req.rawdata = prepOutput(innerResponse)

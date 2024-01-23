@@ -2,3 +2,4 @@ node_modules/
 test.rest
 .eslintrc.json
 tsconfig.json
+.env

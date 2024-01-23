@@ -1,5 +1,5 @@
-const CustomError = require('../types/customError');
-const DBOPERATIONS = require('../database/DBOperations'); const _DB = new DBOPERATIONS();
+const CustomError = require('../types/customError')
+const DBOPERATIONS = require('../database/DBOperations'); const _DB = new DBOPERATIONS()
 
 /** @type {statusTitles} */
 const statusTitles = {
@@ -30,7 +30,6 @@ exports.output = async (req, res) => {
       res.status(rawdata.status).json(rawdata)
       break
   }
-
 }
 
 exports.prepOutput = (response) => {
@@ -43,8 +42,8 @@ exports.prepOutput = (response) => {
     case 409:
       /** @type {ApiReturn} */ ret = {
         status,
-        duration: `${elapsedTime} \u{1F60A}`,
-        message: message ? `${statusText} - ${message}` : statusText,
+        duration: elapsedTime, // \u{1F60A}
+        message: message ? `${statusText} - ${message}` : statusText
       }
       if (Array.isArray(data)) {
         ret.amount = data.length
@@ -56,17 +55,12 @@ exports.prepOutput = (response) => {
   }
 }
 
-
 /**
  * @param {apiOutputError} err
  * @param {ExpressResponse} res
 */
 exports.outputError = async (err, res) => {
-  await _DB.createOrUpdate({
-    log: {
-      err
-    }
-  }, 'gateway_logs')
+  await _DB.createOrUpdate({ log: { err } }, 'gateway_logs')
   const message = err.message
   res.status(err?.status).json({
     data: {
@@ -80,5 +74,3 @@ exports.outputError = async (err, res) => {
 const emptyString = (string) => {
   return (string === undefined || string === '')
 }
-
-

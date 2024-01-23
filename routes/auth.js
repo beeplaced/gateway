@@ -3,7 +3,7 @@ const { grabConfig } = require('../config/readConfig')
 
 const releasedKeys = process.env.RELEASED_KEYS.split(',')
 const publicKey = process.env.PUBLIC_KEY
-const cronKey = process.env.CRON_KEY //For Cron Task only
+const cronKey = process.env.CRON_KEY // For Cron Task only
 const configData = grabConfig()
 
 // /** Decodes and validates Basic Authentication credentials.
@@ -46,23 +46,21 @@ const configData = grabConfig()
  */
 exports.auth = async (req, res, next) => {
   const incomingApiKey = req.headers['x-api-key']
-
   const { auth } = req.authService
-
   try {
-  let access = false
+    let access = false
 
-  switch (true) {
-    case auth === 'cron_key' && cronKey === incomingApiKey:
-    case auth === 'released_keys' && releasedKeys.includes(incomingApiKey):
-    case auth === 'public_key' && publicKey === incomingApiKey:
-    case auth === 'test':
-      access = true
-      break;
+    switch (true) {
+      case auth === 'cron_key' && cronKey === incomingApiKey:
+      case auth === 'released_keys' && releasedKeys.includes(incomingApiKey):
+      case auth === 'public_key' && publicKey === incomingApiKey:
+      case auth === 'test':
+        access = true
+        break
     // case incomingAuth && !incomingApiKey:
     //   auth = await decodeAuth(incomingAuth)
     //   break;
-  }
+    }
     if (!access) {
       throw new CustomError('Authentication failed', 401) // Unauthorized status code
     }
@@ -89,7 +87,7 @@ exports.service = async (req, res, next) => {
     if (urlParts[2] && contentRoute.services[urlParts[2]]) authService = contentRoute.services[urlParts[2]]
     if (contentRoute.services && !urlParts[2]) authService = contentRoute.services.def
     req.authService = authService
-    console.log('authService',authService)
+    console.log('authService', authService)
     req.param = {}
     if (authService.parameter) {
       const params = authService.parameter
