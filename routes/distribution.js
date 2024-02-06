@@ -1,10 +1,9 @@
-const CustomError = require('../types/customError')
+const { customError } = require('../types/errorHandling')
 const WorkerPool = require('worker-pool-task-queue')
 const TaskPool = new WorkerPool(poolSize = 2, './routes/queue.js', maxWorkers = 10, returnWorker = true)
 const { uploadFileChunk } = require('./upload')
-const running = { longtask: false }
+//const running = { longtask: false }
 const { output, prepOutput, outputError } = require('./output')
-const DBOPERATIONS = require('../database/DBOperations'); const _DB = new DBOPERATIONS()
 
 /**
  * @param {request} req - The request object from the API.
@@ -15,32 +14,32 @@ exports.services = async function (req, res, next) {
   const { method, serviceInstance, command, curl } = authService
   const service = serviceInstance || 'axios'
 
-  if (command in running) {
-    switch (true) {
-      case running[command] === true:
-        req.rawdata = {
-          status: 409
-        }
-        next()
-        return
-      default:
-        running[command] = true
-        break
-    }
-  }
+  // if (command in running) { //Need later for lang tasks
+  //   switch (true) {
+  //     case running[command] === true:
+  //       req.rawdata = {
+  //         status: 409
+  //       }
+  //       next()
+  //       return
+  //     default:
+  //       running[command] = true
+  //       break
+  //   }
+  // }
 
-  if (!req || !res) throw new CustomError('nope!', 401)
-  /** @type {string} */ if (emptyString(command)) throw new CustomError('command missing', 401)
+  if (!req || !res) throw await customError({ status: 401, message: 'nope!' })
+  /** @type {string} */ if (emptyString(command)) throw await customError({ status: 401, message: 'command missing' })
 
   switch (true) {
     case command === 'filestorage':
       try {
         const startTime = new Date()
         /** @type {ApiResponse} */ const innerResponse = await uploadFileChunk(req, res)
-        console.log('innerResponse', innerResponse)
+
         const endTime = new Date()
         innerResponse.elapsedTime = `${endTime - startTime} ms`
-        /** @type {ApiReturn} */ req.rawdata = prepOutput(innerResponse)
+        /** @type {ApiReturn} */ req.rawdata = await prepOutput(innerResponse)
         output(req, res)
       } catch (err) {
         outputError(err, res)
@@ -50,31 +49,22 @@ exports.services = async function (req, res, next) {
     /** @type {requestInput} */ const requestInput = { headers, method, service, command }
       if (body && !isEmptyObject(body)) requestInput.body = body
       if (param && !isEmptyObject(param)) requestInput.param = param
-      if (command === 'forward') requestInput.curl = curl
+      if (command === 'forward') {
+        if (!curl) throw await customError({ status: 401, message: 'curl missing!' })
+        requestInput.curl = curl
+      }
 
       const _inner = async () => {
-        try {
           const startTime = new Date() // Record start time
           /** @type {ApiResponse} */ const innerResponse = await TaskPool.runTask(requestInput)
           const endTime = new Date() // Record end time
           innerResponse.elapsedTime = `${endTime - startTime} ms`
-          return prepOutput(innerResponse)
-        } catch (err) {
-          /** @type {*} */
-          console.log(err)
-          await _DB.createOrUpdate({
-            log: {
-              err
-            }
-          }, 'gateway_logs')
-          const error = err
-          throw new CustomError(error.message, error.status || 500)
-        }
+          return await prepOutput(innerResponse)
       }
       _inner()
         .then(rawdata => {
           req.rawdata = rawdata
-          if (command in running) running[command] = false
+          //if (command in running) running[command] = false
           next()
         })
         .catch(err => { outputError(err, res) })

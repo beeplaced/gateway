@@ -1,43 +1,9 @@
-const CustomError = require('../types/customError')
+const { customError } = require('../types/errorHandling')
 const { grabConfig } = require('../config/readConfig')
-
 const releasedKeys = process.env.RELEASED_KEYS.split(',')
 const publicKey = process.env.PUBLIC_KEY
 const cronKey = process.env.CRON_KEY // For Cron Task only
 const configData = grabConfig()
-
-// /** Decodes and validates Basic Authentication credentials.
-//  * @param {string} encodedCredentials - The encoded credentials in the format 'Basic base64(username:password)'.
-//  * @throws {CustomError} Throws a CustomError with a 401 status if authentication fails.
-//  * @returns {Promise<boolean>} Returns a Promise that resolves to true if authentication is successful.
-//  */
-// const decodeAuth = async (encodedCredentials) => {
-//   if (!encodedCredentials) {
-//     throw new CustomError('Authentication failed', 401)
-//   }
-//   const [authType, base64Credentials] = encodedCredentials.split(' ')
-
-//   console.log(authType)
-//   console.log(base64Credentials)
-
-//   if (authType !== 'Basic' || !base64Credentials) {
-//     throw new CustomError('Use Basic Authentication', 401)
-//   }
-
-//   if (base64Credentials !== 'SWAGGER') {
-//     const decodedCredentials = Buffer.from(base64Credentials, 'base64').toString('utf-8')
-//     const [decodedUsername, decodedPassword] = decodedCredentials.split(':')
-
-//     // Check the values
-//     console.log('Decoded Username:', decodedUsername)
-//     console.log('Decoded Password:', decodedPassword)
-
-//     if (decodedUsername !== 'sds-parser' || decodedPassword !== '9T21IFCoJzU4NyR759OQ3zwvMvhMP49R') {
-//       throw new CustomError('Authentication failed', 401)
-//     }
-//   }
-//   return true
-// }
 
 /**
  * @param {request} req - The request object from the API.
@@ -49,7 +15,6 @@ exports.auth = async (req, res, next) => {
   const { auth } = req.authService
   try {
     let access = false
-
     switch (true) {
       case auth === 'cron_key' && cronKey === incomingApiKey:
       case auth === 'released_keys' && releasedKeys.includes(incomingApiKey):
@@ -57,13 +22,8 @@ exports.auth = async (req, res, next) => {
       case auth === 'test':
         access = true
         break
-    // case incomingAuth && !incomingApiKey:
-    //   auth = await decodeAuth(incomingAuth)
-    //   break;
     }
-    if (!access) {
-      throw new CustomError('Authentication failed', 401) // Unauthorized status code
-    }
+    if (!access) { throw await customError({ status: 401 }) }
     next()
   } catch (err) {
     const status = err.status || 500
@@ -83,11 +43,12 @@ exports.service = async (req, res, next) => {
     const request = urlParts[1]
     let authService = {} // Authenticated Service Route
     const contentRoute = configData.routes.find(route => route.path === request)
-    if (!contentRoute) throw new CustomError('request Missing', 401) // Unauthorized status code
-    if (urlParts[2] && contentRoute.services[urlParts[2]]) authService = contentRoute.services[urlParts[2]]
+    console.log('contentRoute', contentRoute)
+    if (!contentRoute) throw await customError({ status: 401 }) // Unauthorized status code
+    if (urlParts[2] && contentRoute.services[urlParts[2]]) authService = contentRoute.services[urlParts[2]] //Combined URL
     if (contentRoute.services && !urlParts[2]) authService = contentRoute.services.def
+    if (!authService.command) authService.command = request
     req.authService = authService
-    console.log('authService', authService)
     req.param = {}
     if (authService.parameter) {
       const params = authService.parameter
@@ -99,7 +60,6 @@ exports.service = async (req, res, next) => {
     }
     next()
   } catch (err) {
-    console.log(err)
     const status = err.status || 500
     res.status(err.status || 500).json({ status, auth: false, error: err.message })
   }

@@ -4,7 +4,7 @@ V 0.0.2
 
 ## Overview
 
-The Content Gateway dynamically routes incoming API calls to defined microservices and returns the [defined result](#result). Service definitions are specified in the `services.json` file. Currently, [adding a new Services](#adding-services) requires manual entry into the `services.json` file.
+The content gateway dynamically directs incoming API calls to specific microservices, ensuring efficient routing and returning the [defined result](#result). Service definitions are specified in the `services.json` file. Currently, [adding a new Services](#adding-services) requires manual entry into the `services.json` file.
 
 
 ## Table of Contents

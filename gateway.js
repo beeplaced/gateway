@@ -8,7 +8,6 @@ const end = require('./routes/output')
 const access = require('./routes/access')
 const app = express()
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpecs))// Serve Swagger documentation at /api-docs
-// Middleware to parse JSON and URL-encoded data
 app.use(express.json())
 app.use(express.urlencoded({ extended: false }))
 app.use(access.cors) // CORS and Rate Limiting middleware

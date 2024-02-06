@@ -34,7 +34,7 @@
     }
   ],
   "paths": {
-    "/public/status": {
+    "/status": {
       "get": {
         "tags": ["Public"],
         "summary": "Get health of Content Gateway as status.",
@@ -48,15 +48,26 @@
                   "type": "object",
                   "properties": {
                     "status": {
+                      "type": "integer",
+                      "example": 200,
+                      "description": "HTTP status code"
+                    },
+                    "duration": {
                       "type": "string",
-                      "description": "The status of the operation"
+                      "example": "1 ms",
+                      "description": "Duration of the operation"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "OK",
+                      "description": "Message indicating the success status"
                     }
                   }
                 }
               }
             }
           },
-          "403": {
+          "401": {
             "description": "Forbidden",
             "content": {
               "application/json": {
@@ -65,12 +76,17 @@
                   "properties": {
                 "status": {
                   "type": "integer",
-                  "example": 403,
+                  "example": 401,
                   "description": "HTTP status code"
                 },
                 "auth": {
                   "type": "string",
-                  "example": "access denied",
+                  "example": "false",
+                  "description": "Error message indicating access is denied"
+                },
+                "error": {
+                  "type": "string",
+                  "example": "Unauthorized",
                   "description": "Error message indicating access is denied"
                 }
                 }
@@ -85,11 +101,147 @@
                 "schema": {
                   "type": "object",
                   "properties": {
-                    "error": {
+                "status": {
+                  "type": "integer",
+                  "example": 500,
+                  "description": "HTTP status code"
+                },
+                "message": {
+                  "type": "string",
+                  "example": "Internal Server Error",
+                  "description": "Internal Server Error"
+                }
+                }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "apiKeyAuth": []
+          }
+        ]
+      },
+        "description": "# API Description\n\nThis API serves as a gateway with limited functionalities. API key is required for authentication, and it must be requested from an admin.\n\n## Changelog\n\n### Version 1.0.0\n- Added user endpoint\n- Added product endpoint\n- Introduced API key authentication\n\n### Version 1.1.0\n- Updated user endpoint to include additional information\n- Bug fixes"
+
+    },
+    "/health": {
+      "get": {
+        "tags": ["Public"],
+        "summary": "Get health of Content Gateway as status.",
+        "description": "Retrieve status information.\n\n**Example Authorization Header:**\n```\nx-api-key: 7d0b2d51-ec70-4076-b02f-109244432a28 (public key with limited access)\n```\n",
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "integer",
+                      "example": 200,
+                      "description": "HTTP status code"
+                    },
+                    "duration": {
                       "type": "string",
-                      "description": "Details about the internal server error"
+                      "example": "1 ms",
+                      "description": "Duration of the operation"
+                    },
+                    "message": {
+                      "type": "string",
+                      "example": "OK",
+                      "description": "Message indicating the success status"
                     }
                   }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                "status": {
+                  "type": "integer",
+                  "example": 401,
+                  "description": "HTTP status code"
+                },
+                "auth": {
+                  "type": "string",
+                  "example": "false",
+                  "description": "Error message indicating access is denied"
+                },
+                "error": {
+                  "type": "string",
+                  "example": "Unauthorized",
+                  "description": "Error message indicating access is denied"
+                }
+                }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                "status": {
+                  "type": "integer",
+                  "example": 500,
+                  "description": "HTTP status code"
+                },
+                "message": {
+                  "type": "string",
+                  "example": "Internal Server Error",
+                  "description": "Internal Server Error"
+                }
+                }
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "apiKeyAuth": []
+          }
+        ]
+      },
+        "description": "# API Description\n\nThis API serves as a gateway with limited functionalities. API key is required for authentication, and it must be requested from an admin.\n\n## Changelog\n\n### Version 1.0.0\n- Added user endpoint\n- Added product endpoint\n- Introduced API key authentication\n\n### Version 1.1.0\n- Updated user endpoint to include additional information\n- Bug fixes"
+
+    },
+    "/error": {
+      "get": {
+        "tags": ["Public"],
+        "summary": "Get error of Content Gateway as status.",
+        "description": "Retrieve status information.\n\n**Example Authorization Header:**\n```\nx-api-key: 7d0b2d51-ec70-4076-b02f-109244432a28 (public key with limited access)\n```\n",
+        "responses": {
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                "status": {
+                  "type": "integer",
+                  "example": 500,
+                  "description": "HTTP status code"
+                },
+                "message": {
+                  "type": "string",
+                  "example": "Internal Server Error",
+                  "description": "Internal Server Error"
+                }
+                }
                 }
               }
             }
@@ -117,6 +269,55 @@
                 "schema": {
                   "type": "object",
                   "properties": "// Define properties based on your response"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Forbidden",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                "status": {
+                  "type": "integer",
+                  "example": 401,
+                  "description": "HTTP status code"
+                },
+                "auth": {
+                  "type": "string",
+                  "example": false,
+                  "description": "Unauthorized"
+                },
+                "error": {
+                  "type": "string",
+                  "example": "Unauthorized",
+                  "description": "Unauthorized"
+                }
+                }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                "status": {
+                  "type": "integer",
+                  "example": 500,
+                  "description": "HTTP status code"
+                },
+                "message": {
+                  "type": "string",
+                  "example": "Internal Server Error",
+                  "description": "Internal Server Error"
+                }
+                }
                 }
               }
             }
@@ -195,7 +396,7 @@
               }
             }
           },
-          "403": {
+          "401": {
             "description": "Forbidden",
             "content": {
               "application/json": {
@@ -204,13 +405,40 @@
                   "properties": {
                 "status": {
                   "type": "integer",
-                  "example": 403,
+                  "example": 401,
                   "description": "HTTP status code"
                 },
                 "auth": {
                   "type": "string",
-                  "example": "access denied",
-                  "description": "Error message indicating access is denied"
+                  "example": false,
+                  "description": "Unauthorized"
+                },
+                "error": {
+                  "type": "string",
+                  "example": "Unauthorized",
+                  "description": "Unauthorized"
+                }
+                }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                "status": {
+                  "type": "integer",
+                  "example": 500,
+                  "description": "HTTP status code"
+                },
+                "message": {
+                  "type": "string",
+                  "example": "Internal Server Error",
+                  "description": "Internal Server Error"
                 }
                 }
                 }
@@ -291,7 +519,7 @@
               }
             }
           },
-          "403": {
+          "401": {
             "description": "Forbidden",
             "content": {
               "application/json": {
@@ -300,13 +528,18 @@
                   "properties": {
                 "status": {
                   "type": "integer",
-                  "example": 403,
+                  "example": 401,
                   "description": "HTTP status code"
                 },
                 "auth": {
                   "type": "string",
-                  "example": "access denied",
-                  "description": "Error message indicating access is denied"
+                  "example": false,
+                  "description": "Unauthorized"
+                },
+                "error": {
+                  "type": "string",
+                  "example": "Unauthorized",
+                  "description": "Unauthorized"
                 }
                 }
                 }
@@ -394,7 +627,7 @@
               }
             }
           },
-          "403": {
+          "401": {
             "description": "Forbidden",
             "content": {
               "application/json": {
@@ -403,13 +636,40 @@
                   "properties": {
                 "status": {
                   "type": "integer",
-                  "example": 403,
+                  "example": 401,
                   "description": "HTTP status code"
                 },
                 "auth": {
                   "type": "string",
-                  "example": "access denied",
-                  "description": "Error message indicating access is denied"
+                  "example": false,
+                  "description": "Unauthorized"
+                },
+                "error": {
+                  "type": "string",
+                  "example": "Unauthorized",
+                  "description": "Unauthorized"
+                }
+                }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Internal Server Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                "status": {
+                  "type": "integer",
+                  "example": 500,
+                  "description": "HTTP status code"
+                },
+                "message": {
+                  "type": "string",
+                  "example": "Internal Server Error",
+                  "description": "Internal Server Error"
                 }
                 }
                 }

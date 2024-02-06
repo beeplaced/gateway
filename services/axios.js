@@ -1,5 +1,6 @@
 const axios = require('axios');
-const CustomError = require('../types/customError')
+
+const { customError } = require('../types/errorHandling')
 
 module.exports = class {
 
@@ -112,11 +113,7 @@ module.exports = class {
             }
             if (response.message) ApiResponseInner.message = response.message
             return ApiResponseInner
-        } catch (err) {
-            /** @type {*} */
-            const error = err
-            CustomError.apiCustomerError(error)
-        }
+        } catch (err) { throw await customError(err) }
     }
 
 }

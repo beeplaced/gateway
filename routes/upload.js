@@ -17,6 +17,7 @@ module.exports.uploadFileChunk = async (req, res) => {
     _service.upload.single('file')(req, res, async (err) => {
       try {
       if (err) {
+        console.log(err)
         return reject({
           data: {},
           status: 300,
@@ -29,11 +30,15 @@ module.exports.uploadFileChunk = async (req, res) => {
       const size = shaify.size
       const extension = shaify.mimetype
       const filebody = shaify.buffer
+      const meta = {}
+        if (req.headers.crawler) meta.crawler = req.headers.crawler
+        if (req.headers.url) meta.url = req.headers.url
 
       const upload = await _DB.createOrUpdate({
         title: filename,
         sha,
         size,
+        meta,
         file: {
           data: filebody,
           contentType: extension, // Adjust the content type as needed

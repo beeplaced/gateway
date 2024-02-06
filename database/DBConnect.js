@@ -25,29 +25,3 @@ exports.connectToMongoDB = (database = process.env.MONGODATABASE) => {
     setTimeout(connectToMongoDB, ConnectTimeout)
   }
 }
-
-// const ENVIRONMENT = 'dev';
-
-// const dbURIDef = `mongodb://localhost:${process.env.MONGOPORT}/${process.env.MONGODATABASE}`;
-
-// let attempts = 0; const Maxattempts = 20; const ConnectTimeout = 10000;
-// const connectionOptions = {}
-// const mongoose = require('mongoose');
-// mongoose.set('strictQuery', true);
-
-// const connections = {}
-
-// exports.connectToMongoDB = (database = 'fusion') => {
-//   try {
-//     const dbUriTry = `mongodb://localhost:${process.env.MONGOPORT}/${database}`;
-//     connections[database] = mongoose.createConnection(dbUriTry, connectionOptions);
-//     return connections
-//   } catch (error) {
-//     console.error('Error connecting to MongoDB:', error); attempts++
-//     if (attempts >= Maxattempts) {
-//       console.error(`Failed to connect to MongoDB after ${Maxattempts} attempts. Exiting...`)
-//       process.exit(1)
-//     }
-//     setTimeout(connectToMongoDB, ConnectTimeout)
-//   }
-// }

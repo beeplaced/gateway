@@ -1,5 +1,41 @@
 {
     "routes": [
+            {
+            "path": "status",
+            "services": {
+                 "def": {
+                    "title": "Status request",
+                    "method": "GET",
+                    "serviceInstance": "status",
+                    "auth": "public_key",
+                    "command": "status"
+                }
+            }
+        },
+        {
+            "path": "health",
+            "services": {
+                 "def": {
+                    "title": "Health request",
+                    "method": "GET",
+                    "serviceInstance": "status",
+                    "auth": "public_key",
+                    "command": "health"
+                }
+            }
+        },
+                {
+            "path": "error",
+            "services": {
+                "def": {
+                    "title": "Error",
+                    "method": "GET",
+                    "serviceInstance": "status",
+                    "auth": "public_key",
+                    "command": "error"
+                }
+            }
+        },
         {
             "path": "jsonplaceholder",
             "services": {
@@ -89,25 +125,13 @@
             }   
         },
         {
-            "path": "public",
-            "services": {
-                 "status": {
-                    "title": "Status",
-                    "method": "GET",
-                    "serviceInstance": "status",
-                    "command": "status",
-                    "transformations": { }
-                }
-            }
-        },
-        {
             "path": "filestorage",
             "services": {
                  "def": {
                     "public": true,
                     "method": "POST",
                     "serviceInstance": "files",
-                    "curl": false,
+                    "auth": "test",
                     "transformations": {}
                     }
             }

@@ -21,6 +21,7 @@ const definitions = {
         sha: { type: String, required: true, unique: true },
         lastUpdate: { type: Date, required: true, default: Date.now  },
         size: { type: Number, required: false },
+        meta: { type: Object, required: false },
         file: {
           data: Buffer,
           contentType: String

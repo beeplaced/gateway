@@ -20,7 +20,8 @@ exports.cors = async (req, res, next) => {
       }
     }, 'gateway_logs')
 
-    const senderOrigin = req.headers.origin
+    const senderOrigin = req.headers.origin || req.headers.referer
+    console.log('senderOrigin', senderOrigin)
     if (!senderOrigin && req.headers['user-agent'] === 'Thunder Client (https://www.thunderclient.com)') {
       next()
       return
