@@ -4,7 +4,8 @@ const service = require('shaify-upload')
 const _service = new service({
   uploadPath: process.env.UPLOADPATHTEMP,
   allowedMimeTypes: ['application/pdf'],
-  mb: 8 //max filesize in mb (default 8)
+  mb: 8, //max filesize in mb (default 8)
+  deletefile: false
 })
 
 /**
@@ -25,15 +26,13 @@ module.exports.uploadFileChunk = async (req, res) => {
         });
       }
       const shaify = await _service.shaify(req.file)
+      console.log(shaify)
       const filename = shaify.originalname
       const sha = shaify.sha
       const size = shaify.size
       const extension = shaify.mimetype
       const filebody = shaify.buffer
-      const meta = {}
-        if (req.headers.crawler) meta.crawler = req.headers.crawler
-        if (req.headers.url) meta.url = req.headers.url
-
+      const meta = JSON.parse(req.body.meta) //JSON.parse(req.headers.meta)
       const upload = await _DB.createOrUpdate({
         title: filename,
         sha,
@@ -46,7 +45,7 @@ module.exports.uploadFileChunk = async (req, res) => {
       }, 'files')
 
       /** @type {ApiResponse} */ const ApiResponse = {
-        data: { filename, sha, size, extension, upload },
+        data: { filename, sha, size, extension },
         status: 200,
         message: 'upload DB_buffer'
       }

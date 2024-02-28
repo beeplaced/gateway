@@ -88,6 +88,7 @@
                     "serviceInstance": "portal",
                     "command": "newfiles",
                     "parameter": ["title"],
+                    "auth": "released_keys",
                     "transformations": {}
                 },
                 "uploadnewfiles": {
@@ -96,6 +97,7 @@
                     "serviceInstance": "files",
                     "command": "uploadnewfiles",
                     "parameter": ["title"],
+                    "auth": "released_keys",
                     "transformations": {}
                 },
                 "checkfilestoparse": {
