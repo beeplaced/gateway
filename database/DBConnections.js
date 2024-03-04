@@ -1,14 +1,6 @@
-// console.log('db connection')
 const mongoose = require('mongoose'); mongoose.set('strictQuery', true);
 const Schema = mongoose.Schema;
-const { connectToMongoDB } = require('./DBConnect');
-const connections = connectToMongoDB();
-const DBConnect = (database = process.env.MONGODATABASE) => {
-  if (!Object.keys(connections).includes(database)){
-    return connectToMongoDB(database)[database]
-  }
-  return connections[database]
-}
+const { DBConnect } = require('./DBConnect');
 
 const schemata = {}
 
@@ -67,14 +59,15 @@ const definitions = {
 
 }
 
-exports._con = (collection) => {
-    if (!schemata[collection]) {
-      const { sch, index } = definitions[collection]()
-      schemata[collection] = new Schema(sch, { collection, versionKey: false, strict: false });
-      if (index) schemata[collection].index(index, { unique: true })
-    }
-    return DBConnect().model(
-      `${collection}`,
-      schemata[collection],
-      `${collection}`,)  
-    }
+exports._con = (collection, database) => {
+  if (!database) database = process.env.MONGODATABASE
+  if (!schemata[collection]) {
+    const { sch, index } = definitions[collection]()
+    schemata[collection] = new Schema(sch, { collection, versionKey: false, strict: false });
+    if (index) schemata[collection].index(index, { unique: true })
+  }
+  return DBConnect(database).model(
+    `${collection}`,
+    schemata[collection],
+    `${collection}`,)
+}

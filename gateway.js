@@ -19,6 +19,6 @@ app.use(end.output) // Output middleware - Apply Services and return value
 const PORT = process.env.PORT || 3000
 app.listen(PORT, () => {
   console.log(`CONTENT GATEWAY @ PORT ${PORT}`)
-  console.log('commands: npm run generate - swagger')
-  console.log('open Swagger UI: http://localhost:3000/api-docs/')
+  // console.log('commands: npm run generate - swagger')
+  // console.log('open Swagger UI: http://localhost:3000/api-docs/')
 })

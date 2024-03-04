@@ -1,8 +1,13 @@
 const { customError } = require('../types/errorHandling')
 const { grabConfig } = require('../config/readConfig')
-const releasedKeys = process.env.RELEASED_KEYS.split(',')
-const publicKey = process.env.PUBLIC_KEY
-const cronKey = process.env.CRON_KEY // For Cron Task only
+
+const RELEASED_KEYS = "68bde212-039e-4247-9934-654e358fed18";
+const PUBLIC_KEY = "7d0b2d51-ec70-4076-b02f-109244432a28"
+const CRON_KEY = "15ecb123-9085-43ac-8dd4-510f34a06587"
+
+const releasedKeys = RELEASED_KEYS.split(',')
+const publicKey = PUBLIC_KEY
+const cronKey = CRON_KEY // For Cron Task only
 const configData = grabConfig()
 
 /**
@@ -43,7 +48,6 @@ exports.service = async (req, res, next) => {
     const request = urlParts[1]
     let authService = {} // Authenticated Service Route
     const contentRoute = configData.routes.find(route => route.path === request)
-    console.log('contentRoute', contentRoute)
     if (!contentRoute) throw await customError({ status: 401 }) // Unauthorized status code
     if (urlParts[2] && contentRoute.services[urlParts[2]]) authService = contentRoute.services[urlParts[2]] //Combined URL
     if (contentRoute.services && !urlParts[2]) authService = contentRoute.services.def
