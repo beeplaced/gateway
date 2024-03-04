@@ -1,6 +1,6 @@
 {
   "name": "api-gateway",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "The content gateway dynamically directs incoming API calls to specific microservices, ensuring efficient routing and returning the predefined results.",
   "main": "gateway.js",
   "scripts": {

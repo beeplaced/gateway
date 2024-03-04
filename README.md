@@ -1,6 +1,6 @@
 # CONTENT API GATEWAY
 
-V 0.0.2
+V 1.0.2
 
 ## Overview
 
@@ -23,6 +23,8 @@ The content gateway dynamically directs incoming API calls to specific microserv
 ## Usage Examples
 
 Here are some examples demonstrating how to make requests to the API using different endpoints:
+
+See swagger/openAPI - http://localhost:3000/api-docs/
 
 ### Get Service Status
 
